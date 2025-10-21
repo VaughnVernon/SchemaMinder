@@ -1,0 +1,26 @@
+name = "kalele-domo-schema-registry"
+main = "functions/_worker.ts"
+compatibility_date = "2024-01-15"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[env.development]
+compatibility_flags = ["nodejs_compat"]
+
+[[env.development.durable_objects.bindings]]
+name = "SCHEMA_REGISTRY_INSTANCE"
+class_name = "SchemaRegistryInstance"
+
+[env.production]
+compatibility_flags = ["nodejs_compat"]
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "SCHEMA_REGISTRY_INSTANCE"
+class_name = "SchemaRegistryInstance"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SchemaRegistryInstance"]

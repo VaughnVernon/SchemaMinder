@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/src/assets/images/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Domo Schema Minder</title>
+    <script>
+      // Polyfills for Node.js modules required by ANTLR4ts
+      // Must be defined before any module loading
+      
+      // Mock process object
+      if (typeof window !== 'undefined' && typeof window.process === 'undefined') {
+        window.process = {
+          env: {},
+          version: 'v16.0.0',
+          versions: { node: '16.0.0' },
+          platform: 'browser',
+          nextTick: function(fn) { setTimeout(fn, 0); }
+        };
+      }
+      
+      // Mock util module
+      if (typeof window !== 'undefined' && typeof window.util === 'undefined') {
+        window.util = {
+          inspect: function(obj, options) {
+            try {
+              if (obj === null) return 'null';
+              if (obj === undefined) return 'undefined';
+              if (typeof obj === 'string') return obj;
+              if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+              if (typeof obj === 'function') return obj.toString();
+              if (obj instanceof Error) return obj.stack || obj.toString();
+              return JSON.stringify(obj, null, 2);
+            } catch (e) {
+              return Object.prototype.toString.call(obj);
+            }
+          }
+        };
+      }
+      
+      // Mock assert module
+      if (typeof window !== 'undefined' && typeof window.assert === 'undefined') {
+        var assert = function(condition, message) {
+          if (!condition) {
+            throw new Error(message || 'Assertion failed');
+          }
+        };
+        
+        // Support common assert methods that ANTLR might use
+        assert.strict = assert;
+        assert.ok = assert;
+        assert.equal = function(actual, expected, message) {
+          if (actual != expected) {
+            throw new Error(message || 'Expected ' + expected + ', got ' + actual);
+          }
+        };
+        
+        // Add assert2 function that ANTLR might be using
+        window.assert2 = assert;
+        window.assert = assert;
+      }
+      
+      // Set global
+      if (typeof window !== 'undefined' && typeof global === 'undefined') {
+        window.global = window;
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

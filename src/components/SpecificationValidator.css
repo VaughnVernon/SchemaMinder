@@ -1,0 +1,213 @@
+.specification-validator {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.validation-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.validation-status.valid {
+  background-color: #d1fae5;
+  color: #064e3b;
+  border: 1px solid #6ee7b7;
+}
+
+.validation-status.invalid {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.validation-status.validating {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.validation-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.field-count {
+  opacity: 0.8;
+  font-size: 13px;
+}
+
+.validation-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.error-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.error-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.error-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.error-item.error {
+  background-color: #fee;
+  color: #c44;
+}
+
+.error-item.warning {
+  background-color: #fff8dc;
+  color: #856404;
+}
+
+.error-item svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.error-location {
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.error-message {
+  flex: 1;
+}
+
+.specification-details {
+  margin-top: 12px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.specification-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  user-select: none;
+  padding: 4px;
+}
+
+.specification-details summary:hover {
+  color: #007bff;
+}
+
+.parsed-structure {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 3px;
+}
+
+.structure-item {
+  margin-bottom: 8px;
+}
+
+.structure-item strong {
+  display: inline-block;
+  min-width: 60px;
+  color: #555;
+}
+
+.field-list {
+  margin: 4px 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.field-list li {
+  padding: 3px 0;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.field-list code {
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 2px;
+  color: #0066cc;
+}
+
+.field-type {
+  margin-left: 8px;
+  color: #666;
+}
+
+.field-default {
+  margin-left: 4px;
+  color: #008800;
+  font-style: italic;
+}
+
+/* Integration with form textarea */
+.form-group.has-validator {
+  position: relative;
+}
+
+.form-group.has-validator textarea.specification {
+  padding-bottom: 24px;
+}
+
+.form-group.validation-error textarea.specification {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+}
+
+.form-group.validation-success textarea.specification {
+  border-color: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
+}
+
+/* Line highlighting in textarea (optional enhancement) */
+.specification-with-errors {
+  position: relative;
+}
+
+.line-markers {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 30px;
+  background-color: #f5f5f5;
+  border-right: 1px solid #ddd;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #999;
+  padding: 8px 4px;
+  pointer-events: none;
+  white-space: pre;
+}
