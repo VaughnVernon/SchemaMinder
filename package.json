@@ -21,6 +21,7 @@
     "complexity:html": "node scripts/complexity-analysis.js && node scripts/complexity-html.js",
     "complexity:open": "npm run complexity:html && npx opener complexity-report.html",
     "generate:pegjs-parser": "node scripts/build-pegjs-parser.js",
+    "init:database": "node scripts/init-database.js",
     "wrangler:dev": "npx wrangler dev --port 8789",
     "partykit:dev": "npx partykit dev --port 1999",
     "wrangler:deploy": "wrangler pages deploy dist"

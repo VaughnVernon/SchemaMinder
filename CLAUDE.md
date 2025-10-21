@@ -21,6 +21,10 @@ npx wrangler dev --port 8789        # Backend API (Cloudflare Worker)
 npx partykit dev --port 1999        # Real-time server
 npm run dev                         # Frontend development server
 
+# Database initialization
+npm run init:database               # Initialize database schema (optional)
+npm run init:database my-tenant my-registry  # With custom tenant/registry
+
 # Build and deployment
 npm run build                       # Build frontend (generates dist/)
 npx wrangler deploy                 # Deploy Worker (NOT pages deploy)
