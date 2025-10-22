@@ -144,7 +144,7 @@ export interface AppEventHandlerDependencies {
   // Hierarchy tree state and actions
   hierarchyState: {
     expandedItems: Set<string>;
-    selectedItem: SelectedItem;
+    selectedItem: SelectedItem | undefined;
     pinnedItem: PinnedItem;
   };
   hierarchyActions: {
