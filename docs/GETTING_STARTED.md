@@ -44,7 +44,7 @@ This guide will help you set up and run the Domo Schema Registry for local devel
 
 ```bash
 git clone <repository-url>
-cd DomoSchemaRegistry
+cd SchemaMinder
 ```
 
 ### 2. Run Setup
