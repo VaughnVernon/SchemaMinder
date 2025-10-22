@@ -29,7 +29,19 @@ export default {
 
     const url = new URL(request.url);
     console.log(`Request: ${request.method} ${url.pathname}`);
-    
+
+    // Health check endpoint (lightweight, no database access)
+    if (url.pathname === '/health' || url.pathname === '/schema-registry/health') {
+      return new Response(JSON.stringify({
+        status: 'healthy',
+        service: 'schema-registry-worker',
+        timestamp: new Date().toISOString()
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
     // API routes with /schema-registry prefix
     if (url.pathname.startsWith('/schema-registry/api/')) {
       try {
@@ -116,7 +128,7 @@ async function handleApiRequest(request: Request, env: Env, url: URL): Promise<R
   }
 
   // For development/testing - allow single tenant mode (simple resource paths like /api/products)
-  if (pathParts.length >= 1 && ['products', 'domains', 'contexts', 'schemas', 'schema-versions', 'registry'].includes(pathParts[0])) {
+  if (pathParts.length >= 1 && ['products', 'domains', 'contexts', 'schemas', 'schema-versions', 'registry', 'find', 'auth', 'admin', 'debug-db', 'changes', 'subscriptions', 'user', 'health'].includes(pathParts[0])) {
     // Single tenant mode: /api/products, /api/domains, etc.
     return handleSingleTenantMode(request, env, pathParts);
   }

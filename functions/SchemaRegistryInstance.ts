@@ -172,6 +172,16 @@ export class SchemaRegistryInstance implements DurableObject {
     const resourceId = pathParts[1];
 
     switch (resource) {
+      case 'health':
+        // Lightweight health check (no database queries)
+        return new Response(JSON.stringify({
+          status: 'healthy',
+          service: 'schema-registry-durable-object',
+          timestamp: this.getTimestamp()
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
       case 'products':
         return this.handleProducts(method, resourceId, request);
       case 'domains':
@@ -1618,6 +1628,8 @@ export class SchemaRegistryInstance implements DurableObject {
     switch (action) {
       case 'reset-password':
         return method === 'POST' ? this.handleResetPassword(request) : this.methodNotAllowed();
+      case 'update-role':
+        return method === 'POST' ? this.handleUpdateRole(request) : this.methodNotAllowed();
       default:
         return new Response(JSON.stringify({ error: 'Admin action not found' }), {
           status: 404,
@@ -1672,6 +1684,93 @@ export class SchemaRegistryInstance implements DurableObject {
       });
     } catch (error) {
       console.error('Password reset error:', error);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Internal server error'
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
+  private async handleUpdateRole(request: Request): Promise<Response> {
+    try {
+      const body = await request.json() as {
+        email: string;
+        roles: string[];
+      };
+
+      // Validate input
+      if (!body.email || !body.roles || !Array.isArray(body.roles)) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: 'Email and roles array are required'
+        }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Option 1: Open for First User
+      // Check if there are any existing users with admin role
+      const adminCheckResults = await this.sql.exec(
+        `SELECT COUNT(*) as count FROM users WHERE roles LIKE '%admin%'`
+      ).toArray();
+
+      const adminCount = (adminCheckResults[0] as any).count;
+      const isFirstAdmin = adminCount === 0;
+
+      // If not the first admin, check if requesting user is authenticated and has admin role
+      if (!isFirstAdmin) {
+        const userId = await this.extractUserIdFromRequest(request);
+        if (!userId) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Authentication required. You must be logged in to update user roles.'
+          }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if requesting user has admin role
+        const requestingUser = await this.userOps.getUserById(userId);
+        if (!requestingUser || !requestingUser.roles.includes('admin')) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Forbidden. Only administrators can update user roles.'
+          }), {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+      }
+
+      // Update the user's roles
+      const result = await this.userOps.updateUserRoles(body.email, body.roles);
+
+      if (!result.success) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: result.error
+        }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: `Roles updated successfully for ${body.email}`,
+        roles: body.roles,
+        isFirstAdmin: isFirstAdmin
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      console.error('Update role error:', error);
       return new Response(JSON.stringify({
         success: false,
         error: 'Internal server error'
