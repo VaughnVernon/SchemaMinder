@@ -31,7 +31,8 @@ const colors = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
   cyan: '\x1b[36m',
-  magenta: '\x1b[35m'
+  magenta: '\x1b[35m',
+  orange: '\x1b[38;5;214m'  // 256-color orange for better visibility
 };
 
 let hasErrors = false;
@@ -336,17 +337,31 @@ async function generateParser() {
 async function verifyTypeScript() {
   printStep(5, 'Verifying TypeScript Compilation');
 
+  const outputFile = path.join(process.cwd(), 'setup_typescript_compilation.txt');
+
   try {
-    execCommand(
-      'npx tsc --noEmit',
-      'TypeScript compiles without errors',
-      { silent: true }
-    );
+    // Redirect all TypeScript output to file
+    execSync('npx tsc --noEmit', {
+      encoding: 'utf8',
+      stdio: 'pipe'
+    });
+
+    // No errors - clean up output file if it exists
+    if (fs.existsSync(outputFile)) {
+      fs.unlinkSync(outputFile);
+    }
+
+    printSuccess('TypeScript compiles without errors');
   } catch (error) {
+    // Write TypeScript errors to file
+    const errorOutput = (error.stdout || '') + (error.stderr || '');
+    fs.writeFileSync(outputFile, errorOutput);
+
     printWarning('TypeScript compilation has errors');
-    printInfo('This is normal during active development');
-    printInfo('The application will still build and run correctly');
-    printInfo('Run "npm run typecheck" to see details if needed');
+    console.log(colors.orange + 'ℹ This is normal during active development' + colors.reset);
+    console.log(colors.orange + 'ℹ The application will still build and run correctly' + colors.reset);
+    console.log(colors.orange + `ℹ Results saved to: ${colors.bright}./setup_typescript_compilation.txt${colors.reset}`);
+    console.log(colors.orange + 'ℹ Run "npm run typecheck" to see detailed errors in terminal' + colors.reset);
   }
 }
 

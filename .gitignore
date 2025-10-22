@@ -159,6 +159,9 @@ test-results.txt
 # ESLint Complexity
 complexity-report.json
 
+# Setup artifacts
+setup_typescript_compilation.txt
+
 # TypeScript cache
 *.tsbuildinfo
 
