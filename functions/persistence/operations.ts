@@ -1,5 +1,5 @@
 /**
- * Database operations for Schema Registry
+ * Database operations for Schema Minder
  */
 
 import { SqlStorage } from '@cloudflare/workers-types';

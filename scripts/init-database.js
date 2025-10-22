@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Database Initialization Script for Kalele Domo Schema Registry
+ * Database Initialization Script for Kalele Domo Schema Minder
  *
  * This script initializes the database schema by making a request to the
  * Durable Object. The schema is automatically initialized on first access,

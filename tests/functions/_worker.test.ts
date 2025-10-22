@@ -60,7 +60,7 @@ describe('Worker', () => {
 
       expect(response.status).toBe(200);
       const responseData = await response.json();
-      expect(responseData.message).toBe('Schema Registry API');
+      expect(responseData.message).toBe('Schema Minder API');
       expect(responseData.version).toBe('1.0.0');
       expect(responseData.routes).toBeDefined();
     });
@@ -70,7 +70,7 @@ describe('Worker', () => {
         {
           id: 'default-registry',
           tenantId: 'tenant1',
-          name: 'Default Schema Registry',
+          name: 'Default Schema Minder',
           description: 'Default registry for development',
           createdAt: expect.any(String),
           updatedAt: expect.any(String)
@@ -86,7 +86,7 @@ describe('Worker', () => {
         expect.objectContaining({
           id: 'default-registry',
           tenantId: 'tenant1',
-          name: 'Default Schema Registry'
+          name: 'Default Schema Minder'
         })
       ]));
     });
@@ -113,7 +113,7 @@ describe('Worker', () => {
       expect(responseData.registry.id).toBe('test-registry-registry');
       expect(responseData.registry.name).toBe('Test Registry');
       expect(responseData.registry.tenantId).toBe('tenant1');
-      
+
       // Verify Durable Object was initialized
       expect(mockDurableObjectNamespace.idFromName).toHaveBeenCalledWith('tenant1:test-registry-registry');
       expect(mockSchemaRegistryInstance.fetch).toHaveBeenCalled();
@@ -198,7 +198,7 @@ describe('Worker', () => {
         status: 200,
         headers: { 'Content-Type': 'text/html' }
       });
-      
+
       mockAssets.fetch
         .mockResolvedValueOnce(mock404Response) // First call returns 404
         .mockResolvedValueOnce(mockIndexResponse); // Second call for index.html
@@ -209,7 +209,7 @@ describe('Worker', () => {
       expect(response.status).toBe(200);
       expect(mockAssets.fetch).toHaveBeenCalledTimes(2);
       expect(mockAssets.fetch).toHaveBeenNthCalledWith(1, request);
-      expect(mockAssets.fetch).toHaveBeenNthCalledWith(2, 
+      expect(mockAssets.fetch).toHaveBeenNthCalledWith(2,
         expect.objectContaining({
           url: expect.stringContaining('/')
         })
@@ -381,7 +381,7 @@ describe('Worker', () => {
       expect(mockSchemaRegistryInstance.fetch).toHaveBeenCalledWith(
         expect.any(Request)
       );
-      
+
       const forwardedRequest = mockSchemaRegistryInstance.fetch.mock.calls[0][0];
       expect(forwardedRequest.method).toBe('POST');
     });
@@ -391,7 +391,7 @@ describe('Worker', () => {
       mockSchemaRegistryInstance.fetch.mockResolvedValue(mockResponse);
 
       const request = new Request('http://localhost/schema-registry/api/tenant1/registry1/products', {
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer token123'
         }
@@ -431,7 +431,7 @@ describe('Worker', () => {
 
       const response = await worker.fetch(request, mockEnv, {} as ExecutionContext);
       const responseData = await response.json();
-      
+
       // Timestamp should not contain milliseconds (.SSS part)
       expect(responseData.registry.createdAt).not.toMatch(/\.\d{3}/);
       expect(responseData.registry.updatedAt).not.toMatch(/\.\d{3}/);

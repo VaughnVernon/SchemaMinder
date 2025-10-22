@@ -14,7 +14,7 @@ const tenantId = 'default-tenant';
 const registryId = 'default-registry';
 const apiUrl = 'http://localhost:8789';
 
-console.log('Domo Schema Registry - Password Reset');
+console.log('Schema Minder - Password Reset');
 console.log('=====================================');
 console.log(`Resetting password for: ${email}`);
 console.log(`New password will be: ${newPassword}`);
@@ -98,7 +98,7 @@ async function resetPassword() {
       console.log(`  Password: ${newPassword}`);
       console.log('═══════════════════════════════════════');
       console.log('');
-      console.log('You can now login to the Schema Registry!');
+      console.log('You can now login to the Schema Minder!');
     } else {
       console.error('✗ Password reset failed');
       console.error(`Error: ${result.error}`);

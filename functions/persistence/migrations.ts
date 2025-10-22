@@ -1,5 +1,5 @@
 /**
- * Database migrations for Schema Registry
+ * Database migrations for Schema Minder
  */
 
 import { DurableObjectState, SqlStorage } from '@cloudflare/workers-types';

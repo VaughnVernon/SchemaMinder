@@ -6,7 +6,7 @@ This guide covers the deployment of the comprehensive authentication system that
 
 ### Phase 5 - Basic Authentication
 - Complete user authentication context (AuthContext)
-- Login and registration functionality  
+- Login and registration functionality
 - Modal-based authentication UI
 - Header integration with user sessions
 - Secure authentication state management
@@ -32,7 +32,7 @@ Ensure all services are running:
 # 1. Start the backend API server
 npx wrangler dev --port 8789
 
-# 2. Start the PartyKit real-time server  
+# 2. Start the PartyKit real-time server
 npx partykit dev --port 1999
 
 # 3. Start the frontend development server
@@ -79,7 +79,7 @@ graph TD
     A[User clicks Sign In] --> B[AuthModal opens]
     B --> C{Login or Register?}
     C -->|Login| D[Login form validation]
-    C -->|Register| E[Registration form validation] 
+    C -->|Register| E[Registration form validation]
     D --> F[Call AuthContext.login]
     E --> G[Call AuthContext.register]
     F --> H{Authentication successful?}
@@ -94,14 +94,14 @@ graph TD
 
 ### Environment Variables
 
-No additional environment variables are required for the authentication system. The system is designed to work with the existing Schema Registry backend API.
+No additional environment variables are required for the authentication system. The system is designed to work with the existing Schema Minder backend API.
 
 ### API Endpoints
 
 The authentication system expects these endpoints to be available:
 
 - `POST /api/auth/login` - User login
-- `POST /api/auth/register` - User registration  
+- `POST /api/auth/register` - User registration
 - `GET /api/auth/me` - Get current user info
 - `POST /api/auth/logout` - User logout
 
@@ -144,10 +144,10 @@ npm test -- --watch
 
 - **Tabbed Interface**: Switch between Login and Register
 - **Form Validation**: Real-time validation with error messages
-- **Password Requirements**: 
+- **Password Requirements**:
   - Minimum 8 characters
   - At least one uppercase letter
-  - At least one lowercase letter  
+  - At least one lowercase letter
   - At least one number
 - **Responsive Design**: Works on desktop and mobile
 - **Keyboard Support**: Tab navigation and Enter to submit
@@ -223,7 +223,7 @@ npm test -- --watch
 
 #### 1. Authentication Modal Not Opening
 **Problem**: Clicking "Sign In" doesn't open the modal
-**Solution**: 
+**Solution**:
 - Check browser console for JavaScript errors
 - Verify AuthProvider is wrapping the App component in main.tsx
 - Ensure AuthModal component is imported and rendered in App.tsx
@@ -378,7 +378,7 @@ npm run type-check
 
 ### Previous Phases
 
-- **Phases 1-4**: Core Schema Registry functionality
+- **Phases 1-4**: Core Schema Minder functionality
 - **Phase 5**: Basic authentication system integration
 - **Phase 6**: Testing and deployment preparation
 - **Phase 7**: Advanced authentication features (current release)
@@ -391,11 +391,11 @@ npm run type-check
 import { useEnhancedAuth } from '../contexts/EnhancedAuthContext';
 
 function MyComponent() {
-  const { 
-    authState, 
-    resetPassword, 
+  const {
+    authState,
+    resetPassword,
     isSessionExpiringSoon,
-    extendSession 
+    extendSession
   } = useEnhancedAuth();
 
   const handlePasswordReset = async (email: string) => {

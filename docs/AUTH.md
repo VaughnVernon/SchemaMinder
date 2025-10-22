@@ -1,8 +1,8 @@
-# Authorization System - Domo Schema Registry
+# Authorization System - Schema Minder
 
 ## Overview
 
-The Domo Schema Registry implements a comprehensive role-based access control (RBAC) system with hierarchical permissions. This document outlines the current authorization roles and enforcement mechanisms.
+The Schema Minder implements a comprehensive role-based access control (RBAC) system with hierarchical permissions. This document outlines the current authorization roles and enforcement mechanisms.
 
 ## 🔐 Authorization Roles
 

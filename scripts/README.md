@@ -1,6 +1,6 @@
 # Scripts Directory
 
-This directory contains utility scripts for the Domo Schema Registry.
+This directory contains utility scripts for the Schema Minder.
 
 ## Available Scripts
 

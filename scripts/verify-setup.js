@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Setup Verification Script for Domo Schema Registry
+ * Setup Verification Script for Schema Minder
  *
  * This script performs comprehensive verification of the entire setup:
  * - Environment configuration
@@ -475,7 +475,7 @@ async function main() {
   print('');
   print(colors.cyan + colors.bright + '╔════════════════════════════════════════════════════════════╗' + colors.reset);
   print(colors.cyan + colors.bright + '║                                                            ║' + colors.reset);
-  print(colors.cyan + colors.bright + '║         Domo Schema Registry - Setup Verification          ║' + colors.reset);
+  print(colors.cyan + colors.bright + '║         Schema Minder - Setup Verification          ║' + colors.reset);
   print(colors.cyan + colors.bright + '║                                                            ║' + colors.reset);
   print(colors.cyan + colors.bright + '╚════════════════════════════════════════════════════════════╝' + colors.reset);
 

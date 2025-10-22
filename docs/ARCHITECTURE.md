@@ -1,7 +1,7 @@
-# Kalele Domo Schema Registry Architecture
+# Kalele Domo Schema Minder Architecture
 
 ## Overview
-The Kalele Domo Schema Registry is a multi-tenant, hierarchical schema management system built on Cloudflare's edge infrastructure using Durable Objects with SQLite storage. It provides complete database isolation per registry instance while maintaining a simple, scalable API structure.
+The Kalele Domo Schema Minder is a multi-tenant, hierarchical schema management system built on Cloudflare's edge infrastructure using Durable Objects with SQLite storage. It provides complete database isolation per registry instance while maintaining a simple, scalable API structure.
 
 ## Core Architecture
 
@@ -40,7 +40,7 @@ const durableObjectId = env.SCHEMA_REGISTRY_INSTANCE.idFromName(`${tenantId}:${r
 
 ### Production Deployment Model
 
-The Schema Registry deploys as a unified system across Cloudflare's global edge network with multiple isolation layers:
+The Schema Minder deploys as a unified system across Cloudflare's global edge network with multiple isolation layers:
 
 ```
 Cloudflare Pages (Global CDN)
@@ -74,7 +74,7 @@ export default {
 ```javascript
 // Automatic instance creation per tenant:registry combination
 const kalele_prod = env.SCHEMA_REGISTRY_INSTANCE.idFromName('kalele:prod')      // Instance 1
-const acme_dev = env.SCHEMA_REGISTRY_INSTANCE.idFromName('acme:dev')            // Instance 2  
+const acme_dev = env.SCHEMA_REGISTRY_INSTANCE.idFromName('acme:dev')            // Instance 2
 const company_stage = env.SCHEMA_REGISTRY_INSTANCE.idFromName('company:stage')  // Instance 3
 ```
 
@@ -113,7 +113,7 @@ const company_stage = env.SCHEMA_REGISTRY_INSTANCE.idFromName('company:stage')  
 **Example Scaling:**
 ```
 1 tenant = $0.01/month base + usage
-100 tenants = $0.01/month base + 100x usage  
+100 tenants = $0.01/month base + 100x usage
 10,000 tenants = $0.01/month base + 10,000x usage
 ```
 
@@ -131,7 +131,7 @@ npm run build → wrangler deploy → Global edge deployment
 
 **Zero Infrastructure Management:**
 - No servers to provision
-- No databases to configure  
+- No databases to configure
 - No load balancers to manage
 - No scaling rules to define
 
@@ -140,7 +140,7 @@ npm run build → wrangler deploy → Global edge deployment
 **Automatic Edge Placement:**
 ```
 US East users → DO instances in US East Cloudflare POPs
-Europe users → DO instances in European Cloudflare POPs  
+Europe users → DO instances in European Cloudflare POPs
 Asia users → DO instances in Asian Cloudflare POPs
 ```
 
@@ -156,7 +156,7 @@ This architecture provides **unlimited multi-tenant scale** with **zero operatio
 ### 6-Level Hierarchy
 ```
 Products (Organizations)
-└── Domains (Business Units)  
+└── Domains (Business Units)
     └── Contexts (Bounded Contexts)
         └── Schema Types (Commands/Data/Documents/Envelopes/Events)
             └── Schema Names (Logical schemas)
@@ -166,7 +166,7 @@ Products (Organizations)
 ### Data Relationships
 ```sql
 products (1) ──→ (N) domains
-domains (1) ──→ (N) contexts  
+domains (1) ──→ (N) contexts
 contexts (1) ──→ (N) schemas
 schemas (1) ──→ (N) schema_versions
 ```
@@ -190,15 +190,15 @@ My Product → My Domain → My Context
 ```bash
 # Simplified routes for development/testing
 GET  /schema-registry/api/products              # Uses default-tenant:default-registry
-POST /schema-registry/api/domains               
-PUT  /schema-registry/api/contexts/:id          
+POST /schema-registry/api/domains
+PUT  /schema-registry/api/contexts/:id
 ```
 
 #### Multi-Tenant Mode (Production)
 ```bash
 # Full tenant isolation
 GET  /schema-registry/api/kalele/prod/products           # kalele:prod database
-GET  /schema-registry/api/acme/staging/products         # acme:staging database  
+GET  /schema-registry/api/acme/staging/products         # acme:staging database
 POST /schema-registry/api/company-x/dev/schemas         # company-x:dev database
 ```
 
@@ -207,7 +207,7 @@ POST /schema-registry/api/company-x/dev/schemas         # company-x:dev database
 # List registries for a tenant
 GET  /schema-registry/api/{tenantId}/registries
 
-# Create new registry instance  
+# Create new registry instance
 POST /schema-registry/api/{tenantId}/registries
 ```
 
@@ -224,7 +224,7 @@ Each Durable Object contains:
 ```sql
 -- Per-registry database tables
 products (id, name, description, created_at, updated_at)
-domains (id, name, description, product_id, created_at, updated_at)  
+domains (id, name, description, product_id, created_at, updated_at)
 contexts (id, name, description, domain_id, created_at, updated_at)
 schemas (id, name, description, schema_type_category, scope, context_id, created_at, updated_at)
 schema_versions (id, specification, semantic_version, description, status, schema_id, created_at, updated_at)
@@ -232,7 +232,7 @@ schema_versions (id, specification, semantic_version, description, status, schem
 -- Indexes for performance
 idx_domains_product_id, idx_contexts_domain_id, idx_schemas_context_id, idx_schema_versions_schema_id
 
--- Constraints for data integrity  
+-- Constraints for data integrity
 CHECK (schema_type_category IN ('Commands', 'Data', 'Documents', 'Envelopes', 'Events'))
 CHECK (scope IN ('Public', 'Private'))
 CHECK (status IN ('Draft', 'Published', 'Deprecated', 'Removed'))
@@ -250,10 +250,10 @@ FOREIGN KEY constraints with CASCADE delete
 ```
 Cloudflare Pages (Static Frontend)
     ↓
-Cloudflare Functions (API Router)  
+Cloudflare Functions (API Router)
     ↓
 Durable Objects (Schema Registry Instances)
-    ↓  
+    ↓
 SQLite Storage (Per-registry databases)
 ```
 
@@ -269,7 +269,7 @@ SQLite Storage (Per-registry databases)
 name = "kalele-domo-schema-registry"
 [[durable_objects.bindings]]
 name = "SCHEMA_REGISTRY_INSTANCE"
-class_name = "SchemaRegistryInstance" 
+class_name = "SchemaRegistryInstance"
 script_name = "kalele-domo-schema-registry"
 
 [[migrations]]
@@ -287,7 +287,7 @@ new_sqlite_classes = ["SchemaRegistryInstance"]
 
 ### Missing (Production Requirements)
 - ❌ **Authentication:** No user authentication
-- ❌ **Authorization:** No tenant access validation  
+- ❌ **Authorization:** No tenant access validation
 - ❌ **Rate Limiting:** No per-tenant quotas
 - ❌ **Audit Logging:** No access logs per tenant
 - ❌ **API Keys:** No tenant-scoped API keys
@@ -308,7 +308,7 @@ async function validateTenantAccess(tenantId: string, apiKey: string) {
 ### Creating a Schema Version
 ```
 1. POST /schema-registry/api/kalele/prod/schema-versions
-2. Router extracts: tenantId="kalele", registryId="prod"  
+2. Router extracts: tenantId="kalele", registryId="prod"
 3. Creates Durable Object ID: "kalele:prod"
 4. Routes to SchemaRegistryInstance.createSchemaVersion()
 5. Validates schema_id exists in same database
@@ -323,7 +323,7 @@ User B: POST /schema-registry/api/acme/prod/products {"name": "Product A"}
 
 Result:
 - kalele:prod database gets Product A with UUID-1
-- acme:prod database gets Product A with UUID-2  
+- acme:prod database gets Product A with UUID-2
 - Completely isolated - no conflicts
 ```
 
@@ -358,7 +358,7 @@ console.error('Create schema error:', error);
 ### Metrics Available
 - Request latency per endpoint
 - Error rates per registry
-- Database operation performance  
+- Database operation performance
 - Durable Object memory usage
 - SQLite storage consumption
 
@@ -375,13 +375,13 @@ console.error('Create schema error:', error);
 tests/
 ├── setup.ts              # Wrangler dev server management
 ├── api.test.ts            # Core API endpoints (10 tests)
-├── multi-tenant.test.ts   # Tenant isolation (8 tests)  
+├── multi-tenant.test.ts   # Tenant isolation (8 tests)
 └── error-handling.test.ts # Validation & constraints (17 tests)
 ```
 
 ### Test Coverage
 - ✅ **CRUD Operations:** All resources tested
-- ✅ **Multi-tenant Isolation:** Database separation verified  
+- ✅ **Multi-tenant Isolation:** Database separation verified
 - ✅ **Error Scenarios:** Constraint violations, invalid inputs
 - ✅ **Auto-initialization:** Default hierarchy creation
 - ✅ **Registry Management:** Creation, listing, stats
@@ -400,7 +400,7 @@ API Gateway → JWT Validation → Tenant Authorization → Durable Objects
 
 ### Advanced Features
 - **Schema Validation:** JSON Schema validation of specifications
-- **Version Compatibility:** Semantic version conflict detection  
+- **Version Compatibility:** Semantic version conflict detection
 - **Schema Evolution:** Automated migration suggestions
 - **Registry Federation:** Cross-registry schema references
 - **Webhook Integration:** Change notifications

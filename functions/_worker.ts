@@ -69,11 +69,11 @@ export default {
     try {
       // Try to get the asset from the ASSETS binding
       const response = await env.ASSETS.fetch(request);
-      
+
       if (response.ok) {
         return response;
       }
-      
+
       // For SPA routing, serve index.html for non-API routes that return 404
       if (!url.pathname.startsWith('/schema-registry/api/') && response.status === 404) {
         try {
@@ -86,10 +86,10 @@ export default {
           console.error('Could not serve index.html for SPA routing:', indexError);
         }
       }
-      
+
       // Return the original response (likely a 404)
       return response;
-      
+
     } catch (error) {
       console.error('Static file serving error:', error);
     }
@@ -101,10 +101,10 @@ export default {
 
 async function handleApiRequest(request: Request, env: Env, url: URL): Promise<Response> {
   const pathParts = url.pathname.replace('/schema-registry/api/', '').split('/').filter(p => p);
-  
+
   if (pathParts.length === 0) {
-    return new Response(JSON.stringify({ 
-      message: 'Schema Registry API',
+    return new Response(JSON.stringify({
+      message: 'Schema Minder API',
       version: '1.0.0',
       routes: {
         tenants: '/schema-registry/api/{tenantId}/registries',
@@ -143,15 +143,15 @@ async function handleSingleTenantMode(request: Request, env: Env, pathParts: str
   // For development - use default tenant and registry
   const tenantId = 'default-tenant';
   const registryId = 'default-registry';
-  
+
   return handleMultiTenantRequest(request, env, tenantId, registryId, pathParts, new URL(request.url));
 }
 
 async function handleMultiTenantRequest(
-  request: Request, 
-  env: Env, 
-  tenantId: string, 
-  registryId: string, 
+  request: Request,
+  env: Env,
+  tenantId: string,
+  registryId: string,
   resourcePath: string[],
   url: URL
 ): Promise<Response> {
@@ -159,11 +159,11 @@ async function handleMultiTenantRequest(
     // Get Durable Object instance
     const durableObjectId = env.SCHEMA_REGISTRY_INSTANCE.idFromName(`${tenantId}:${registryId}`);
     const durableObject = env.SCHEMA_REGISTRY_INSTANCE.get(durableObjectId);
-    
+
     // Create new URL for the Durable Object with just the resource path
     const newUrl = new URL(request.url);
     newUrl.pathname = '/' + resourcePath.join('/');
-    
+
     // Forward the request to the Durable Object
     const newRequest = new Request(newUrl.toString(), {
       method: request.method,
@@ -171,14 +171,14 @@ async function handleMultiTenantRequest(
       body: request.body,
       duplex: 'half' as RequestDuplex,
     });
-    
+
     return await durableObject.fetch(newRequest);
   } catch (error) {
     console.error('Multi-tenant request error:', error);
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: 'Failed to process request',
       tenant: tenantId,
-      registry: registryId 
+      registry: registryId
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -231,7 +231,7 @@ async function createRegistry(request: Request, env: Env, tenantId: string): Pro
     // Create/initialize the Durable Object
     const durableObjectId = env.SCHEMA_REGISTRY_INSTANCE.idFromName(`${tenantId}:${registryId}`);
     const durableObject = env.SCHEMA_REGISTRY_INSTANCE.get(durableObjectId);
-    
+
     // Initialize the registry by making a request to it
     const initRequest = new Request('https://example.com/registry', { method: 'GET' });
     await durableObject.fetch(initRequest);

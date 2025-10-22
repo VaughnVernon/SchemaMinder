@@ -1,6 +1,6 @@
 # Password Reset Scripts
 
-This directory contains scripts for resetting user passwords in the Domo Schema Registry.
+This directory contains scripts for resetting user passwords in the Schema Minder.
 
 ## Prerequisites
 

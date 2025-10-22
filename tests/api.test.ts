@@ -12,11 +12,11 @@ async function apiRequest(method: string, path: string, body?: any): Promise<Res
       'Content-Type': 'application/json',
     },
   }
-  
+
   if (body) {
     options.body = JSON.stringify(body)
   }
-  
+
   try {
     const response = await fetch(`${BASE_URL}${path}`, options)
     return response
@@ -26,14 +26,14 @@ async function apiRequest(method: string, path: string, body?: any): Promise<Res
   }
 }
 
-describe('Schema Registry API', () => {
+describe('Schema Minder API', () => {
   describe('API Root', () => {
     it('should return API information', async () => {
       const response = await apiRequest('GET', '/schema-registry/api/')
       expect(response.status).toBe(200)
-      
+
       const data = await response.json()
-      expect(data).toHaveProperty('message', 'Schema Registry API')
+      expect(data).toHaveProperty('message', 'Schema Minder API')
       expect(data).toHaveProperty('version', '1.0.0')
       expect(data).toHaveProperty('routes')
     })
@@ -43,12 +43,12 @@ describe('Schema Registry API', () => {
     it('should return products with initial data', async () => {
       const response = await apiRequest('GET', `/schema-registry/api/${testTenant}/${testRegistry}/products`)
       expect(response.status).toBe(200)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('products')
       expect(Array.isArray(data.products)).toBe(true)
       expect(data.products.length).toBeGreaterThan(0)
-      
+
       // Check initial product structure
       const product = data.products[0]
       expect(product).toHaveProperty('id')
@@ -62,10 +62,10 @@ describe('Schema Registry API', () => {
         name: 'Test Product',
         description: 'A test product for API testing'
       }
-      
+
       const response = await apiRequest('POST', `/schema-registry/api/${testTenant}/${testRegistry}/products`, newProduct)
       expect(response.status).toBe(201)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('id')
       expect(data).toHaveProperty('name', newProduct.name)
@@ -93,10 +93,10 @@ describe('Schema Registry API', () => {
         description: 'A test domain',
         productId: productId
       }
-      
+
       const response = await apiRequest('POST', `/schema-registry/api/${testTenant}/${testRegistry}/domains`, newDomain)
       expect(response.status).toBe(201)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('id')
       expect(data).toHaveProperty('name', newDomain.name)
@@ -109,7 +109,7 @@ describe('Schema Registry API', () => {
     it('should get all domains', async () => {
       const response = await apiRequest('GET', `/schema-registry/api/${testTenant}/${testRegistry}/domains`)
       expect(response.status).toBe(200)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('domains')
       expect(Array.isArray(data.domains)).toBe(true)
@@ -132,10 +132,10 @@ describe('Schema Registry API', () => {
         description: 'A test context',
         domainId: domainId
       }
-      
+
       const response = await apiRequest('POST', `/schema-registry/api/${testTenant}/${testRegistry}/contexts`, newContext)
       expect(response.status).toBe(201)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('id')
       expect(data).toHaveProperty('name', newContext.name)
@@ -148,7 +148,7 @@ describe('Schema Registry API', () => {
     it('should get all contexts', async () => {
       const response = await apiRequest('GET', `/schema-registry/api/${testTenant}/${testRegistry}/contexts`)
       expect(response.status).toBe(200)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('contexts')
       expect(Array.isArray(data.contexts)).toBe(true)
@@ -173,10 +173,10 @@ describe('Schema Registry API', () => {
         scope: 'Public',
         contextId: contextId
       }
-      
+
       const response = await apiRequest('POST', `/schema-registry/api/${testTenant}/${testRegistry}/schemas`, newSchema)
       expect(response.status).toBe(201)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('id')
       expect(data).toHaveProperty('name', newSchema.name)
@@ -191,7 +191,7 @@ describe('Schema Registry API', () => {
     it('should get all schemas', async () => {
       const response = await apiRequest('GET', `/schema-registry/api/${testTenant}/${testRegistry}/schemas`)
       expect(response.status).toBe(200)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('schemas')
       expect(Array.isArray(data.schemas)).toBe(true)
@@ -202,7 +202,7 @@ describe('Schema Registry API', () => {
     it('should return registry statistics', async () => {
       const response = await apiRequest('GET', `/schema-registry/api/${testTenant}/${testRegistry}/registry`)
       expect(response.status).toBe(200)
-      
+
       const data = await response.json()
       expect(data).toHaveProperty('stats')
       expect(data.stats).toHaveProperty('products')

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Setup Script for Domo Schema Registry
+ * Setup Script for Schema Minder
  *
  * This script performs initial setup for new developers:
  * - Runs preflight checks
@@ -433,7 +433,7 @@ async function runSetup() {
   console.log('');
   console.log(colors.bright + colors.cyan + '╔════════════════════════════════════════════════════════════════╗' + colors.reset);
   console.log(colors.bright + colors.cyan + '║                                                                ║' + colors.reset);
-  console.log(colors.bright + colors.cyan + '║         Domo Schema Registry - Environment Setup               ║' + colors.reset);
+  console.log(colors.bright + colors.cyan + '║         Schema Minder - Environment Setup               ║' + colors.reset);
   console.log(colors.bright + colors.cyan + '║                                                                ║' + colors.reset);
   console.log(colors.bright + colors.cyan + '╚════════════════════════════════════════════════════════════════╝' + colors.reset);
   console.log('');

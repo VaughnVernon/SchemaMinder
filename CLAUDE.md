@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The Kalele Domo Schema Registry is a multi-tenant, hierarchical schema management system built on Cloudflare's edge infrastructure. It manages schema lifecycles for distributed systems using a Published Language pattern from Domain-Driven Design.
+The Kalele Domo Schema Minder is a multi-tenant, hierarchical schema management system built on Cloudflare's edge infrastructure. It manages schema lifecycles for distributed systems using a Published Language pattern from Domain-Driven Design.
 
 ### Initialization Prompt
 

@@ -123,7 +123,7 @@ Full multi-tenant support with isolated registry instances:
 GET  /schema-registry/api/{tenantId}/registries           # List registries for tenant
 POST /schema-registry/api/{tenantId}/registries           # Create new registry
 
-# Schema Registry Operations
+# Schema Minder Operations
 GET  /schema-registry/api/{tenantId}/{registryId}/products       # Get products
 POST /schema-registry/api/{tenantId}/{registryId}/products       # Create product
 PUT  /schema-registry/api/{tenantId}/{registryId}/products/:id   # Update product

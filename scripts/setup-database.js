@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Database Setup Script for Domo Schema Registry
+ * Database Setup Script for Schema Minder
  *
  * This script provides a comprehensive database setup process:
  * 1. Checks if backend server is running
@@ -476,7 +476,7 @@ async function main() {
   print('');
   print(colors.cyan + colors.bright + '╔════════════════════════════════════════════════════════════╗' + colors.reset);
   print(colors.cyan + colors.bright + '║                                                            ║' + colors.reset);
-  print(colors.cyan + colors.bright + '║         Domo Schema Registry - Database Setup              ║' + colors.reset);
+  print(colors.cyan + colors.bright + '║         Schema Minder - Database Setup              ║' + colors.reset);
   print(colors.cyan + colors.bright + '║                                                            ║' + colors.reset);
   print(colors.cyan + colors.bright + '╚════════════════════════════════════════════════════════════╝' + colors.reset);
   print('');

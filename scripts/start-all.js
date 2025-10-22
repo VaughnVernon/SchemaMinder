@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Multi-Server Orchestration Script for Domo Schema Registry
+ * Multi-Server Orchestration Script for Schema Minder
  *
  * Starts and monitors all three servers:
  * - Backend API (Wrangler/Cloudflare Worker) on port 8789
@@ -367,7 +367,7 @@ function setupSignalHandlers() {
 async function main() {
   print('\n' + colors.bright + colors.cyan + '╔════════════════════════════════════════════════════════════╗' + colors.reset);
   print(colors.bright + colors.cyan + '║                                                            ║' + colors.reset);
-  print(colors.bright + colors.cyan + '║         Domo Schema Registry - Multi-Server Start          ║' + colors.reset);
+  print(colors.bright + colors.cyan + '║         Schema Minder - Multi-Server Start          ║' + colors.reset);
   print(colors.bright + colors.cyan + '║                                                            ║' + colors.reset);
   print(colors.bright + colors.cyan + '╚════════════════════════════════════════════════════════════╝' + colors.reset);
 

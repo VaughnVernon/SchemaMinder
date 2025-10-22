@@ -288,7 +288,7 @@ const App: React.FC = () => {
     return (
       <div className="loading-container">
         <div className="loading-message">
-          <h2>Loading Schema Registry...</h2>
+          <h2>Loading Schema Minder...</h2>
           <p>Tenant: {tenantInfo.tenantId}</p>
           <p>Registry: {tenantInfo.registryId}</p>
         </div>
@@ -306,7 +306,7 @@ const App: React.FC = () => {
           <button onClick={clearError} className="error-close">×</button>
         </div>
       )}
-      
+
       {/* Only show main content when authenticated */}
       {authState.isAuthenticated && (
         <main className="main-container">

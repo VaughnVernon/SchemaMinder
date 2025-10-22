@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Password Reset Script for Kalele Domo Schema Registry
+ * Password Reset Script for Kalele Domo Schema Minder
  *
  * This script resets a user's password in the SQLite database of a Durable Object.
  * It connects to the local Wrangler dev environment or can be adapted for production.

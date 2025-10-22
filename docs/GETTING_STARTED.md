@@ -1,6 +1,6 @@
-# Getting Started with Domo Schema Registry
+# Getting Started with Schema Minder
 
-This guide will help you set up and run the Domo Schema Registry for local development.
+This guide will help you set up and run the Schema Minder for local development.
 
 ## Table of Contents
 
@@ -267,7 +267,7 @@ npm run start:all
 **Output example**:
 ```
 ╔════════════════════════════════════════════════════════════╗
-║         Domo Schema Registry - Multi-Server Start          ║
+║         Schema Minder - Multi-Server Start          ║
 ╚════════════════════════════════════════════════════════════╝
 
 Multi-Server Startup - Pre-flight Checks
@@ -541,7 +541,7 @@ npm run setup
 
 ## Health Check Endpoints
 
-The Schema Registry provides health check endpoints for monitoring and load balancing.
+The Schema Minder provides health check endpoints for monitoring and load balancing.
 
 ### Available Endpoints
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Pre-flight Check Script for Domo Schema Registry
+ * Pre-flight Check Script for Schema Minder
  *
  * Validates that the development environment is properly configured
  * before attempting to run the application.
@@ -297,7 +297,7 @@ function checkWranglerAuth() {
  * Main preflight check
  */
 async function runPreflightChecks() {
-  console.log(colors.bright + '\nDomo Schema Registry - Pre-flight Check\n' + colors.reset);
+  console.log(colors.bright + '\nSchema Minder - Pre-flight Check\n' + colors.reset);
 
   // Environment checks
   printHeader('Environment');

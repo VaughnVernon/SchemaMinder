@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Create Admin User Script for Kalele Domo Schema Registry
+ * Create Admin User Script for Kalele Domo Schema Minder
  *
  * This script creates an admin user by making a registration request
  * and then directly updating the user's role in the database.
