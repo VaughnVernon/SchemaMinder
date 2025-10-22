@@ -14,9 +14,36 @@ This is the root of a product codebase. The product is a schema registry. You an
 
 ## Essential Commands
 
+### Initial Setup (First Time)
+
+**Full guide**: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)
+
+```bash
+# Complete environment setup (interactive)
+npm run setup                       # Creates .env.local, prompts for admin credentials, handles ports
+
+# Pre-flight check (validate environment)
+npm run preflight                   # Check Node version, ports, dependencies, etc.
+
+# Start all servers
+npm run start:all                   # Backend + PartyKit + Frontend
+
+# Create admin user (in another terminal, after backend is running)
+npm run create:admin admin@example.com SecurePass123! "Admin User"
+```
+
+**Environment Files**:
+- `.env` - Base defaults (committed)
+- `.env.development` - Dev team defaults (committed)
+- `.env.local` - Your personal settings (git-ignored, created by setup)
+- `.env.production` - Production template (committed)
+
 ### Development
 ```bash
-# Start all services (required for development)
+# Start all services together (recommended)
+npm run start:all                   # Backend + PartyKit + Frontend (using concurrently)
+
+# OR start services individually (separate terminals)
 npx wrangler dev --port 8789        # Backend API (Cloudflare Worker)
 npx partykit dev --port 1999        # Real-time server
 npm run dev                         # Frontend development server
@@ -81,6 +108,7 @@ Frontend (React + Vite) ↔ Cloudflare Worker (API) ↔ Durable Objects (Data)
 - **Enhanced Auth**: `EnhancedAuthContext` with advanced features (password reset, session management, RBAC)
 - **Middleware**: `AuthMiddleware` for route protection
 - **Roles**: guest, viewer, editor, admin with hierarchical permissions
+- **Admin Endpoint**: `/api/admin/update-role` - First admin can self-promote without auth, subsequent changes require admin credentials
 
 ### Data Flow
 - **Frontend**: React hooks (`useSchemaRegistry`, `useRealTimeUpdates`)
@@ -161,6 +189,21 @@ The system uses a custom grammar for schema definitions:
   category.SchemaName:1.2.1 versionedReference
 }
 ```
+
+## Health Check Endpoints
+
+The system provides multiple health check endpoints for different monitoring needs:
+
+- **`/health`** - Fastest, Worker-only health check (no database)
+- **`/schema-registry/health`** - Alternative Worker health endpoint
+- **`/schema-registry/api/health`** - Durable Object health (includes database initialization check)
+- **`/schema-registry/api/registry`** - Full registry info with statistics (slowest, most detailed)
+
+**Recommendations:**
+- Load balancers: Use `/health`
+- Kubernetes liveness: Use `/health`
+- Kubernetes readiness: Use `/api/health`
+- Monitoring dashboards: Use `/api/registry`
 
 ## Important Notes
 

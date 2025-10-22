@@ -1114,3 +1114,1120 @@ Follow-up questions and answers:
     - Com.Example.UserMgmt → com::example::user_mgmt (snake_case with ::)?
     - Or just use the last segment as the outer module name?
     - Answer: Please snake_case the full name: com_example_user_mgmt
+
+---
+
+## Environment Setup Is Weak or Non-existent
+
+● Prompt: It seems like there are still some missing pieces. Attempting to initialize these areas independently is apparently not enough. What would be required to initialize the entire environment for new developers? Please provide a plan based on the database initialization and admin user creation that was implemented, and what is currently missing for full environment initialization. Do not take any modifying steps before my review and approval.
+
+● Response: Based on my thorough analysis, here's a comprehensive plan for full environment initialization:
+
+  ---
+  Complete Environment Initialization Plan
+
+  Current State Analysis
+
+  What Works:
+
+  ✅ Database schema initialization (automatic on first access)✅ Sample data creation (My Product → My Domain → My Context)✅
+  Scripts for database init and admin user creation✅ All three servers can start independently
+
+  What's Missing:
+
+  1. No Getting Started / Quick Start Documentation
+
+  - No step-by-step guide for new developers
+  - No single entry point for "clone and run"
+  - Developers need to piece together information from multiple docs
+
+  2. Dependencies Not Installed Automatically
+
+  - npm install is not documented as first step
+  - No verification that dependencies are installed
+
+  3. Three-Server Coordination
+
+  - Backend (Wrangler) on port 8789
+  - Real-time (PartyKit) on port 1999
+  - Frontend (Vite) on port 5173
+  - No orchestration or single command to start all three
+  - No health check to verify all servers are running
+  - No clear startup order documented
+
+  4. Admin User Creation Incomplete
+
+  - Script exists but /api/admin/update-role endpoint doesn't exist
+  - Requires manual SQL execution
+  - No automated way to create first admin user
+  - No default credentials documented
+
+  5. Environment Configuration Missing
+
+  - No .env.example file
+  - No environment variable documentation
+  - Tenant/Registry IDs hardcoded in scripts
+  - API URLs hardcoded
+
+  6. Pre-flight Checks Missing
+
+  - No verification that Node.js version is compatible
+  - No check that required ports are available
+  - No validation that PegJS parser was generated
+  - No TypeScript compilation check before runtime
+
+  7. Database Verification Missing
+
+  - No way to verify database initialized correctly
+  - No query tool or inspection script
+  - No sample queries for testing
+
+  8. Real-time Server Connection Not Validated
+
+  - Frontend connects to PartyKit but no verification
+  - No error handling if PartyKit not running
+  - No reconnection logic documented
+
+  ---
+  Proposed Solution: Multi-Phase Initialization System
+
+  Phase 1: Pre-flight Checks Script
+
+  File: scripts/preflight-check.js
+
+  Checks:
+  - Node.js version (≥18.0.0)
+  - npm installed
+  - Dependencies installed (node_modules/ exists)
+  - Ports 8789, 1999, 5173 available
+  - PegJS parser generated
+  - TypeScript compiles without errors
+  - Wrangler authenticated (for deployment)
+
+  Output: Pass/Fail with actionable error messages
+
+  ---
+  Phase 2: Environment Configuration
+
+  Files:
+  - .env.example (template)
+  - .env (gitignored, created by setup)
+
+  Variables:
+  # API Configuration
+  API_URL=http://localhost:8789
+  VITE_API_URL=http://localhost:8789
+
+  # Real-time Server
+  PARTYKIT_URL=http://localhost:1999
+  VITE_PARTYKIT_URL=http://localhost:1999
+
+  # Multi-tenant Configuration
+  TENANT_ID=default-tenant
+  REGISTRY_ID=default-registry
+
+  # Admin User (for initial setup)
+  ADMIN_EMAIL=admin@example.com
+  ADMIN_PASSWORD=ChangeMe123!
+  ADMIN_FULL_NAME=Administrator
+
+  # Development
+  NODE_ENV=development
+
+  ---
+  Phase 3: Complete Setup Script
+
+  File: scripts/setup.js
+
+  Steps:
+  1. Run preflight checks
+  2. Create .env from .env.example if not exists
+  3. Install dependencies (npm install)
+  4. Generate PegJS parser (npm run generate:pegjs-parser)
+  5. Run TypeScript compilation check
+  6. Display next steps
+
+  ---
+  Phase 4: Multi-Server Orchestration
+
+  File: scripts/start-all.js
+
+  Functionality:
+  - Start Wrangler (port 8789) in background
+  - Start PartyKit (port 1999) in background
+  - Wait for both servers to be healthy (HTTP ping)
+  - Start Vite (port 5173) in foreground
+  - Display real-time logs from all servers
+  - Handle Ctrl+C to stop all servers gracefully
+
+  Alternative: Use concurrently npm package
+  "start:all": "concurrently \"npm:wrangler:dev\" \"npm:partykit:dev\" \"npm run dev\""
+
+  ---
+  Phase 5: Database Setup Script
+
+  File: scripts/setup-database.js
+
+  Functionality:
+  1. Check if backend is running (or start it)
+  2. Initialize database (npm run init:database)
+  3. Create admin user with credentials from .env
+  4. Implement /api/admin/update-role endpoint in backend
+  5. Update user to admin role
+  6. Verify admin can login
+  7. Display credentials for first login
+
+  ---
+  Phase 6: Verification Script
+
+  File: scripts/verify-setup.js
+
+  Checks:
+  1. All three servers responding
+  2. Database initialized (query products)
+  3. Admin user exists and can authenticate
+  4. PartyKit WebSocket connection works
+  5. Frontend can reach backend
+  6. Real-time updates work (send test message)
+
+  ---
+  Phase 7: Getting Started Documentation
+
+  File: docs/GETTING_STARTED.md
+
+  Sections:
+  1. Prerequisites (Node.js 18+, npm)
+  2. Quick Start (5 steps)
+  3. Manual Setup (detailed)
+  4. Troubleshooting
+  5. Next Steps (creating first schema)
+
+  Quick Start:
+  1. git clone <repo>
+  2. cd DomoSchemaRegistry
+  3. npm run setup          # Runs preflight, installs deps, generates parser
+  4. npm run setup:database # Initializes DB and creates admin user
+  5. npm run start:all      # Starts all three servers
+
+  ---
+  Phase 8: Admin Role Update Endpoint
+
+  Location: functions/SchemaRegistryInstance.ts
+
+  New Endpoint: POST /admin/update-role
+
+  Functionality:
+  private async handleAdminUpdateRole(request: Request): Promise<Response> {
+    const { email, roles } = await request.json();
+
+    // Validate roles array
+    // Update user in database
+    // Return success/failure
+  }
+
+  Security:
+  - Initially open for setup
+  - Later: Require authentication with existing admin role
+  - Rate limiting
+
+  ---
+  Phase 9: Health Check Endpoints
+
+  New Endpoints:
+  - GET /health - Backend health
+  - GET /health/database - Database connectivity
+  - GET /health/ready - Full readiness check
+
+  ---
+  Phase 10: Package.json Scripts Update
+
+  New Scripts:
+  {
+    "setup": "node scripts/setup.js",
+    "setup:database": "node scripts/setup-database.js",
+    "preflight": "node scripts/preflight-check.js",
+    "verify": "node scripts/verify-setup.js",
+    "start:all": "node scripts/start-all.js",
+    "start:all:concurrent": "concurrently \"npm:wrangler:dev\" \"npm:partykit:dev\" \"npm run dev\"",
+    "db:query": "node scripts/query-database.js",
+    "db:reset": "node scripts/reset-database.js"
+  }
+
+  ---
+  Files to Create/Modify
+
+  New Files:
+
+  1. scripts/preflight-check.js - Pre-flight validation
+  2. scripts/setup.js - Complete environment setup
+  3. scripts/setup-database.js - Database + admin user setup
+  4. scripts/start-all.js - Multi-server orchestration
+  5. scripts/verify-setup.js - Post-setup verification
+  6. scripts/query-database.js - Database inspection tool
+  7. scripts/reset-database.js - Reset to clean state
+  8. .env.example - Environment template
+  9. docs/GETTING_STARTED.md - Developer onboarding guide
+  10. docs/TROUBLESHOOTING.md - Common issues and solutions
+
+  Modified Files:
+
+  1. package.json - Add new scripts, add concurrently dependency
+  2. functions/SchemaRegistryInstance.ts - Add admin endpoint and health checks
+  3. CLAUDE.md - Update with new scripts
+  4. README.md - Add link to GETTING_STARTED.md
+  5. scripts/README.md - Document new scripts
+
+  ---
+  Implementation Priority
+
+  High Priority (Immediate Impact):
+
+  1. ✅ .env.example - Prevents hardcoded values
+  2. ✅ scripts/setup.js - One command to setup
+  3. ✅ scripts/start-all.js - One command to run
+  4. ✅ docs/GETTING_STARTED.md - Clear onboarding
+  5. ✅ Admin endpoint implementation - Automated admin creation
+
+  Medium Priority (Developer Experience):
+
+  6. ✅ scripts/preflight-check.js - Prevent common errors
+  7. ✅ scripts/verify-setup.js - Confirm everything works
+  8. ✅ Health check endpoints - Debugging aid
+
+  Low Priority (Nice to Have):
+
+  9. ✅ scripts/query-database.js - Database inspection
+  10. ✅ docs/TROUBLESHOOTING.md - Self-service support
+
+  ---
+  Expected Outcome
+
+  Before (Current):
+  # Developer needs to:
+  1. Read multiple docs
+  2. Run npm install manually
+  3. Start three servers in three terminals
+  4. Figure out database initialization
+  5. Manually create admin user with SQL
+  6. Hope everything connects
+
+  After (Proposed):
+  # Developer only needs to:
+  git clone <repo>
+  cd DomoSchemaRegistry
+  npm run setup
+  npm run setup:database  # Creates admin user automatically
+  npm run start:all
+
+  # App running at http://localhost:5173
+  # Login with: admin@example.com / ChangeMe123!
+
+  ---
+  Questions for Review:
+
+  1. Should we use concurrently npm package or custom script for multi-server orchestration?
+  2. Should admin endpoint be locked down immediately or stay open for first user?
+  3. Should we include sample schemas in initial setup?
+  4. Should .env be auto-generated with random admin password?
+  5. Should we add Docker/Docker Compose as an alternative setup method?
+
+  ---
+  Awaiting your review and approval before proceeding with implementation.
+
+> Please explain question 1: 1. Should we use concurrently npm package or custom script for multi-server orchestration?
+
+● Question 1: Multi-Server Orchestration Approach
+
+  The Problem
+
+  The application requires three separate servers running simultaneously:
+
+  ┌─────────────────────────────────────────────────────────┐
+  │ Developer needs all three running:                      │
+  │                                                         │
+  │ Terminal 1: npx wrangler dev --port 8789                │
+  │             (Cloudflare Worker backend)                 │
+  │                                                         │
+  │ Terminal 2: npx partykit dev --port 1999                │
+  │             (Real-time WebSocket server)                │
+  │                                                         │
+  │ Terminal 3: npm run dev                                 │
+  │             (Vite frontend on port 5173)                │
+  └─────────────────────────────────────────────────────────┘
+
+  Currently, a new developer must:
+  - Open 3 terminal windows/tabs
+  - Run 3 commands separately
+  - Monitor 3 separate log outputs
+  - Remember to stop all 3 when done
+
+  Option 1: concurrently npm Package
+
+  What it is:
+
+  A battle-tested npm package that runs multiple commands in parallel and manages their lifecycle.
+
+  Implementation:
+
+  # Install as dev dependency
+  npm install --save-dev concurrently
+
+  # package.json
+  {
+    "scripts": {
+      "start:all": "concurrently \"npm:wrangler:dev\" \"npm:partykit:dev\" \"npm run dev\" --names \"API,RT,UI\" --prefix-colors
+   \"blue,magenta,cyan\""
+    }
+  }
+
+  Pros:
+
+  ✅ Mature & Reliable - 50M+ weekly downloads, well-tested✅ Zero Code to Maintain - Just configuration✅ Rich Features
+  Out-of-Box:
+  - Colored output per server (blue for API, magenta for RT, cyan for UI)
+  - Named prefixes ([API], [RT], [UI])
+  - Automatic cleanup - Ctrl+C kills all processes
+  - Restart individual servers on failure
+  - Kill all if one fails (--kill-others-on-fail)
+  - Success exit when all complete (--success all)
+
+  ✅ Cross-Platform - Works on Windows, Mac, Linux✅ Simple Configuration - One line in package.json✅ Well-Documented -
+  Extensive examples and community support
+
+  Cons:
+
+  ❌ External Dependency - Adds ~100KB to node_modules❌ Less Control - Can't easily add custom logic (health checks, sequential
+   startup)❌ No Built-in Health Checks - Can't wait for servers to be ready before starting next❌ Limited Error Handling -
+  Can't implement custom recovery logic
+
+  Example Output:
+
+  [API] ⎔ Starting local server...
+  [RT]  PartyKit v0.0.115
+  [UI]  VITE v5.0.0  ready in 450 ms
+  [API] ⬢ [wrangler:inf] Ready on http://localhost:8789
+  [RT]  ✨ http://127.0.0.1:1999
+  [UI]  ➜  Local:   http://localhost:5173/
+
+  ---
+  Option 2: Custom Script (scripts/start-all.js)
+
+  What it is:
+
+  A Node.js script we write to manage the server lifecycle with full control.
+
+  Implementation:
+
+  #!/usr/bin/env node
+  const { spawn } = require('child_process');
+
+  const servers = [
+    { name: 'API', cmd: 'npx', args: ['wrangler', 'dev', '--port', '8789'], color: '\x1b[34m' },
+    { name: 'RT',  cmd: 'npx', args: ['partykit', 'dev', '--port', '1999'], color: '\x1b[35m' },
+    { name: 'UI',  cmd: 'npm',  args: ['run', 'dev'], color: '\x1b[36m' }
+  ];
+
+  // Custom logic here:
+  // - Wait for health checks
+  // - Sequential startup
+  // - Custom error handling
+  // - Graceful shutdown
+
+  Pros:
+
+  ✅ Full Control - Implement any logic we need✅ Health Checks - Wait for each server to be ready before starting next✅
+  Sequential Startup - Start backend, wait for health, then start frontend✅ Custom Error Handling - Retry logic, custom error
+  messages✅ Better User Experience:
+  ✓ Starting backend API...
+  ✓ Backend healthy on http://localhost:8789
+  ✓ Starting real-time server...
+  ✓ Real-time server healthy on http://localhost:1999
+  ✓ Starting frontend...
+  ✓ All servers running!
+
+  🎉 Ready to develop!
+     Frontend: http://localhost:5173
+     Backend:  http://localhost:8789
+     PartyKit: http://localhost:1999
+
+  ✅ No External Dependencies - Just Node.js built-ins✅ Educational - New developers can see how it works✅ Port Conflict
+  Detection - Check ports before starting✅ Better Shutdown - Send proper SIGTERM signals
+
+  Cons:
+
+  ❌ Code to Maintain - We own the code and bugs❌ More Complex - ~200-300 lines vs 1 line config❌ Cross-Platform Issues -
+  Different signal handling on Windows❌ Reinventing the Wheel - Solving already-solved problems❌ Testing Required - Need to
+  test on different platforms
+
+  Example Implementation (Simplified):
+
+  async function startServer(server) {
+    console.log(`Starting ${server.name}...`);
+
+    const process = spawn(server.cmd, server.args, {
+      stdio: 'pipe',
+      shell: true
+    });
+
+    process.stdout.on('data', (data) => {
+      console.log(`${server.color}[${server.name}]\x1b[0m ${data}`);
+    });
+
+    // Wait for health check
+    await waitForHealthy(server.healthUrl);
+    console.log(`✓ ${server.name} healthy`);
+
+    return process;
+  }
+
+  async function waitForHealthy(url, maxAttempts = 30) {
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) return true;
+      } catch (e) { /* retry */ }
+      await sleep(1000);
+    }
+    throw new Error(`Server not healthy after ${maxAttempts} seconds`);
+  }
+
+  ---
+  **Comparison Table**
+
+  | Feature          | concurrently           | Custom Script          |
+  |------------------|------------------------|------------------------|
+  | Setup Time       | 5 minutes              | 2-3 hours              |
+  | Maintenance      | None (package updates) | Ongoing (our code)     |
+  | Parallel Start   | ✅ Built-in            | ✅ We implement        |
+  | Sequential Start | ❌ Not supported       | ✅ We control order    |
+  | Health Checks    | ❌ No                  | ✅ We implement        |
+  | Port Checking    | ❌ No                  | ✅ We implement        |
+  | Colored Output   | ✅ Built-in            | ✅ We implement        |
+  | Named Prefixes   | ✅ Built-in            | ✅ We implement        |
+  | Auto Cleanup     | ✅ Built-in            | ✅ We implement        |
+  | Cross-Platform   | ✅ Tested              | ⚠️ Needs testing       |
+  | Learning Curve   | Low (read docs)        | High (understand code) |
+  | Dependencies     | 1 package              | 0 packages             |
+  | Flexibility      | Low                    | High                   |
+
+  ---
+  **My Recommendation: Hybrid Approach**
+
+  Use concurrently for development simplicity
+
+  "start:all": "concurrently \"npm:wrangler:dev\" \"npm:partykit:dev\" \"npm run dev\""
+
+  Plus a custom setup script for environment initialization
+
+  // scripts/setup.js does:
+  1. Check ports available
+  2. Verify environment
+  3. Initialize database
+  4. Create admin user
+  5. Run health checks
+  6. Display success message with URLs
+
+  Why Both?
+
+  concurrently handles the easy part:
+  - Running multiple processes
+  - Colored output
+  - Cleanup on exit
+  - Cross-platform compatibility
+
+  Custom script handles the hard part:
+  - Pre-flight checks
+  - Database initialization
+  - Admin user creation
+  - Health verification
+  - User-friendly messages
+
+  ---
+  Recommendation Summary
+
+  For Question 1, I recommend:
+
+  ✅ Use concurrently for npm run start:all
+  - Simple, reliable, zero maintenance
+  - Perfect for daily development workflow
+  - "Just works" on all platforms
+
+  ✅ Create custom setup.js for initial setup
+  - One-time setup tasks
+  - Health checks and validation
+  - Better error messages
+  - Educational for new developers
+
+  This gives us:
+  - Fast daily workflow (concurrently)
+  - Robust initialization (custom script)
+  - Best of both worlds
+
+  ---
+  Would you like me to proceed with this hybrid approach, or do you prefer one of the pure options?
+
+- **_NOTE:_ I chose the hybrid approach.**
+
+
+Perfect! Phase 1 is complete. Let me create a summary of what was accomplished:
+
+  Phase 1 Implementation Complete ✓
+
+  I've successfully implemented the hybrid approach for environment setup and multi-server orchestration. Here's what was
+  created:
+
+  New Files Created:
+
+  1. scripts/setup.js (395 lines)
+    - Complete interactive setup script for new developers
+    - Runs preflight checks, creates .env, installs dependencies, generates parser
+    - Displays comprehensive next steps with color-coded output
+  2. scripts/preflight-check.js (373 lines)
+    - Validates Node.js ≥18.0.0
+    - Checks ports 8789, 1999, 5173 availability
+    - Verifies dependencies, PegJS parser, TypeScript compilation
+    - Optional Wrangler authentication check
+  3. .env.example (84 lines)
+    - Complete environment variable template
+    - Documents all API URLs, tenant/registry IDs, admin credentials
+    - Includes port configuration and optional Cloudflare settings
+
+  Modified Files:
+
+  4. package.json
+    - Added setup script: node scripts/setup.js
+    - Added preflight script: node scripts/preflight-check.js
+    - Added start:all script: Uses concurrently to run all three servers together with color-coded output
+  5. scripts/README.md
+    - Documented setup.js and preflight-check.js
+    - Updated Development Workflow section with new developer onboarding steps
+    - Added daily development workflows
+  6. CLAUDE.md
+    - Added "Initial Setup (First Time)" section with setup commands
+    - Updated Development section to recommend npm run start:all
+
+  New npm Scripts Available:
+
+  npm run setup       # Complete environment setup
+  npm run preflight   # Pre-flight environment checks
+  npm run start:all   # Start all servers (Backend + PartyKit + Frontend)
+
+  Testing Results:
+
+  ✅ Preflight check script validated successfully
+  ✅ Setup script syntax validated
+  ✅ All npm scripts registered and available
+  ✅ Documentation updated across all files
+
+  New Developer Workflow:
+
+  1. Initial setup
+
+      ```npm run setup```
+
+  2. Review .env
+
+      ```vi .env```
+
+  3. Start all servers
+
+      ```npm run start:all```
+
+  4. Create admin user (in another terminal)
+
+      ```npm run create:admin admin@example.com Pass123! "Admin User"```
+
+  5. Open browser
+
+      ```http://localhost:5173```
+
+---
+
+**Phase 2: Environment**
+
+**_Options: Questions and answers_**
+
+1. Default Tenant/Registry IDs
+  - A) Keep as-is
+2. Admin Credentials in .env
+  - B) Prompt for values interactively - Ask during setup
+3. Port Conflict Handling
+  - Hybrid:
+    - Warn that standard ports are unavailable (displaying standard port numbers)
+    - Prompt user with option to stop and free up standard ports (X) or override (o)
+    - If the answer is `o` to override, prompt for each port by name and suggest alternative numbers: 8790, 2000, 5174
+4. Environment File Placement
+  - Questions:
+    - What is the difference between local and development?
+    - Is local or development a standard and the other the developer's choice?
+    - If A is chosen: What is needed for production? Will production environment need to be set up separately? What values would be used for production?
+  - B) Multiple files - .env.local, .env.development, .env.production
+5. Validation Level
+  - A) Basic check
+
+**_Claude Code Feedback to Above Answers with New Questions_**
+
+  What is needed for production?
+
+  For this Cloudflare-based project:
+
+  Production environment variables are set in Cloudflare:
+
+  ```
+  # Via wrangler CLI:
+  npx wrangler secret put ADMIN_PASSWORD
+  npx wrangler secret put DATABASE_ENCRYPTION_KEY
+
+  # Via wrangler.toml [vars] section:
+  [vars]
+  TENANT_ID = "production-tenant"
+  REGISTRY_ID = "main-registry"
+  API_URL = "https://schema-registry.yourdomain.com"
+  PARTYKIT_URL = "https://realtime.yourdomain.com"
+  ```
+
+  The .env.production file would be a TEMPLATE:
+
+  ```
+  # .env.production (committed to git as documentation)
+  # These values are set in Cloudflare dashboard or via wrangler
+
+  # Production URLs
+  API_URL=https://schema-registry.yourdomain.com
+  VITE_API_URL=https://schema-registry.yourdomain.com
+  PARTYKIT_URL=https://realtime.yourdomain.com
+  VITE_PARTYKIT_URL=https://realtime.yourdomain.com
+
+  # Production tenant/registry
+  TENANT_ID=production-tenant
+  REGISTRY_ID=main-registry
+
+  # Secrets (SET VIA: npx wrangler secret put)
+  # ADMIN_PASSWORD=<set-via-wrangler-secret>
+  # DATABASE_ENCRYPTION_KEY=<set-via-wrangler-secret>
+  ```
+
+  Recommended Approach for Phase 2:
+
+  Given your choice of B) Multiple files, here's what I'll create:
+
+  `.env.example`            → Delete (replaced by env templates below)
+
+  `.env`                    → Base defaults (ports, localhost URLs)
+
+  `.env.development`        → Development-specific settings
+
+  `.env.production`         → Production template (documentation)
+
+  `.gitignore`              → Add `.env.local`, `.env.*.local`
+
+  During npm run setup:
+  1. Check if .env.local exists
+  2. If not, create .env.local by:
+    - Copying from .env.development
+    - Prompting for admin credentials (Q2)
+    - Handling port conflicts (Q3)
+  3. Result: Developer has working .env.local for their machine
+
+  `.gitignore` additions:
+
+  ```
+  # Local environment overrides (personal settings)
+  .env.local
+  .env.*.local
+
+  # Never commit actual secrets
+  .env.production.local
+  ```
+
+  Summary of File Purposes:
+
+  | File             | Committed to Git? | Purpose            | Example Values                     |
+  |------------------|-------------------|--------------------|------------------------------------|
+  | .env             | ✅ Yes             | Base defaults      | Port numbers, feature flags        |
+  | .env.development | ✅ Yes             | Dev team defaults  | API_URL=http://localhost:8789      |
+  | .env.production  | ✅ Yes             | Prod template/docs | API_URL=https://... (placeholders) |
+  | .env.local       | ❌ No              | Your machine       | Your admin password, custom ports  |
+
+  Does this clarify Question 4?
+
+  Should I proceed with Phase 2 using:
+  - Q1: A - Keep default tenant/registry IDs as-is
+  - Q2: B - Prompt for admin credentials interactively
+  - Q3: Hybrid - Warn about ports, offer override with alternative suggestions
+  - Q4: B - Multiple files (.env, .env.development, .env.production, user's .env.local)
+  - Q5: A - Basic validation
+
+● Perfect! Phase 2 is complete. Let me create a summary:
+
+  Phase 2 Implementation Complete ✅
+
+  Files Created:
+
+  1. .env - Base configuration (committed to git)
+    - Server ports (8789, 1999, 5173)
+    - Node environment
+    - Default tenant/registry IDs
+    - Testing configuration
+  2. .env.development - Development team defaults (committed to git)
+    - Localhost API URLs
+    - Localhost PartyKit URLs
+    - Placeholder admin credentials (documentation only)
+    - Debug configuration
+  3. .env.production - Production template (committed to git)
+    - Production URL templates
+    - Cloudflare deployment instructions
+    - Secrets management documentation
+    - Comprehensive deployment guide
+  4. docs/GETTING_STARTED.md - Comprehensive getting started guide (4,500+ lines)
+    - Prerequisites and quick start
+    - Detailed environment configuration documentation
+    - File structure and load priority
+    - Purpose of each environment file
+    - Development workflow
+    - Troubleshooting guide
+    - Production deployment instructions
+    - Quick command reference
+
+  Files Modified:
+
+  5. .gitignore - Updated to handle new environment file structure
+    - Commits: .env, .env.development, .env.production
+    - Ignores: .env.local, .env.*.local
+    - Added clear comments explaining the strategy
+  6. scripts/setup.js - Enhanced with interactive prompts
+    - Q2 Implementation: Prompts for admin credentials interactively
+    - Q3 Implementation: Hybrid port conflict handling
+        - Detects unavailable ports
+      - Warns with port numbers
+      - Offers choice: stop (X) or override (o)
+      - Prompts for alternative port numbers (8790, 2000, 5174)
+    - Creates .env.local (not .env)
+    - Updates next steps to reference new file structure
+  7. scripts/README.md - Updated with environment file references
+    - Links to GETTING_STARTED.md
+    - Documents new environment file structure
+    - Updated workflow instructions
+  8. CLAUDE.md - Updated with environment configuration
+    - Links to GETTING_STARTED.md
+    - Documents environment files
+    - Updated setup commands
+
+  Files Deleted:
+
+  9. .env.example - Removed (replaced by .env, .env.development, .env.production)
+
+  Implementation Details:
+
+  Q1 (Default Tenant/Registry IDs): ✅ Kept as-is
+  TENANT_ID=default-tenant
+  REGISTRY_ID=default-registry
+
+  Q2 (Admin Credentials): ✅ Interactive prompts
+  - Setup script prompts for: email, password, full name
+  - Default suggestions provided in brackets
+  - Values written to .env.local (git-ignored)
+
+  Q3 (Port Conflicts): ✅ Hybrid approach
+  // 1. Check ports 8789, 1999, 5173
+  // 2. If unavailable, warn user
+  // 3. Prompt: "Stop (X) or override (o)?"
+  // 4. If override, prompt for alternatives: 8790, 2000, 5174
+  // 5. Update .env.local with custom ports
+
+  Q4 (Environment Files): ✅ Multiple files
+  - .env - Base defaults
+  - .env.development - Dev team settings
+  - .env.production - Production template
+  - .env.local - Personal settings (created by setup)
+
+  Q5 (Validation): ✅ Basic check
+  - File exists check
+  - Key presence check
+  - Detailed validation deferred to preflight
+
+  Documentation Highlights:
+
+  The docs/GETTING_STARTED.md includes:
+  - Environment Configuration section with comprehensive table
+  - Load Priority explanation (1. .env → 2. .env.development → 3. .env.local)
+  - Purpose and examples for each file type
+  - When to commit vs git-ignore guidelines
+  - Production deployment with Cloudflare instructions
+  - Troubleshooting for common environment issues
+
+---
+
+**Phase 3: Improved Setup**
+
+**_Recommendation: Move to Phase 4 because Phase 3 work is good enough for now_**
+
+  What We Already Have:
+
+  - ✅ Preflight checks (Phase 1)
+  - ✅ .env.local creation with interactive prompts (Phase 2)
+  - ✅ Dependency installation (Phase 1)
+  - ✅ PegJS parser generation (Phase 1)
+  - ✅ TypeScript compilation check (Phase 1)
+  - ✅ Next steps display (Phase 1)
+
+  What Might Be Missing:
+
+  Looking at the original plan, Phase 3 might have included:
+  1. Health checks after server start - Verify servers are actually responding
+  2. Automatic database initialization - Call init:database as part of setup
+  3. Automatic admin user creation - Create admin during setup (not just provide instructions)
+  4. Setup verification - Test that the whole system works end-to-end
+
+**_Possibly Useful: What could be done later..._**
+
+- Add a `--non-interactive` mode for CI/CD for automated environments where prompts won't work:
+
+  ```
+  npm run setup -- --non-interactive \
+    --admin-email=admin@example.com \
+    --admin-password=$ADMIN_PASSWORD \
+    --admin-name="Admin User"
+  ```
+
+---
+
+**Phase 4: Multi-Server Orchestration**
+
+The multi-server orchestration now provides:
+  - Pre-flight checks ✅
+  - Health monitoring ✅
+  - Graceful shutdown ✅
+  - Clear status reporting ✅
+  - Professional developer experience ✅
+
+---
+
+**Phase 5: Improved Database Setup**
+
+Improvements made:
+
+- `package.json`
+
+  ```
+  "setup:database": "node scripts/setup-database.js"
+  ```
+
+- New documentation
+  - scripts/README.md
+  - docs/GETTING_STARTED.md
+
+Database setup is now:
+  - Comprehensive ✅
+  - Interactive ✅
+  - Automated (CI/CD) ✅
+  - Well-documented ✅
+  - User-friendly ✅
+
+---
+
+**Phase 6: Preflight and Verification Checks**
+
+Setup verification now provides:
+  - Comprehensive checking ✅
+  - Smart detection ✅
+  - Clear reporting ✅
+  - Actionable recommendations ✅
+  - Multiple modes ✅
+
+
+---
+
+**Phase 8: Admin Role Update Endpoint**
+
+**_Security Options: Admin Priviledges_**
+
+● Please explain your second question that was posed before we began with Phase 1: > 2. Should admin endpoint be locked down immediately or stay open for first user?
+
+● Great question! Let me explain the security consideration around the admin endpoint.
+
+  The Issue
+
+  In scripts/create-admin-user.js (lines 86-144), there's a call to a non-existent endpoint:
+
+  // This endpoint doesn't exist yet
+  const response = await fetch(`${apiUrl}/schema-registry/api/admin/update-role`, {
+    method: 'POST',
+    body: JSON.stringify({
+      email: email,
+      roles: ['admin']
+    })
+  });
+
+  This endpoint would allow changing any user's role to admin. The question is: Who should be allowed to call it?
+
+  Option 1: Open for First User (Bootstrap Mode)
+
+  How it works:
+  - When the database is empty (no users exist), the endpoint is open to anyone
+  - First user to call it becomes admin
+  - After first admin exists, endpoint requires admin authentication
+
+  Pros:
+  - ✅ Simple initial setup
+  - ✅ No manual SQL needed
+  - ✅ Works in any environment (local, staging, production)
+  - ✅ Self-service for new deployments
+
+  Cons:
+  - ⚠️ Security risk: If you deploy to production and forget to create admin first, anyone can become admin
+  - ⚠️ Race condition: Multiple users could try to become admin simultaneously
+  - ⚠️ Requires careful deployment process
+
+  Code example:
+  // In functions/SchemaRegistryInstance.ts
+  async handleAdminUpdateRole(request: Request): Promise<Response> {
+    const body = await request.json();
+    const { email, roles } = body;
+
+    // Check if ANY admin exists
+    const existingAdmins = await this.sql
+      .prepare('SELECT COUNT(*) as count FROM users WHERE roles LIKE ?')
+      .bind('%admin%')
+      .first();
+
+    if (existingAdmins.count === 0) {
+      // Bootstrap mode: No admin exists, allow first user
+      await this.updateUserRole(email, roles);
+      return new Response(JSON.stringify({ success: true, bootstrapped: true }));
+    }
+
+    // Normal mode: Require admin authentication
+    const authUser = await this.authenticateRequest(request);
+    if (!authUser?.roles?.includes('admin')) {
+      return new Response('Forbidden', { status: 403 });
+    }
+
+    await this.updateUserRole(email, roles);
+    return new Response(JSON.stringify({ success: true }));
+  }
+
+  Option 2: Always Locked Down (Secure by Default)
+
+  How it works:
+  - Endpoint always requires admin authentication
+  - First admin must be created via direct database access
+  - After that, admins can promote other users
+
+  Pros:
+  - ✅ Maximum security: No window of vulnerability
+  - ✅ No race conditions
+  - ✅ Clear audit trail (manual SQL is explicit)
+  - ✅ Prevents accidental exposure
+
+  Cons:
+  - ❌ Requires database access for initial setup
+  - ❌ More complex deployment (especially on Cloudflare)
+  - ❌ Manual SQL for first user:
+  UPDATE users SET roles = '["admin"]' WHERE email_address = 'admin@example.com';
+
+  Code example:
+  // In functions/SchemaRegistryInstance.ts
+  async handleAdminUpdateRole(request: Request): Promise<Response> {
+    // ALWAYS require admin authentication
+    const authUser = await this.authenticateRequest(request);
+    if (!authUser?.roles?.includes('admin')) {
+      return new Response('Forbidden', { status: 403 });
+    }
+
+    const body = await request.json();
+    const { email, roles } = body;
+
+    await this.updateUserRole(email, roles);
+    return new Response(JSON.stringify({ success: true }));
+  }
+
+  Option 3: Environment-Based (Hybrid)
+
+  How it works:
+  - Use environment variable ALLOW_BOOTSTRAP_ADMIN=true for local/dev
+  - Production defaults to ALLOW_BOOTSTRAP_ADMIN=false
+  - Best of both worlds
+
+  Pros:
+  - ✅ Convenient for local development
+  - ✅ Secure in production
+  - ✅ Explicit configuration
+
+  Cons:
+  - ⚠️ Requires environment variable management
+  - ⚠️ Risk of misconfiguration (leaving bootstrap enabled in prod)
+
+  Code example:
+  async handleAdminUpdateRole(request: Request, env: Env): Promise<Response> {
+    const body = await request.json();
+    const { email, roles } = body;
+
+    // Check if bootstrap mode is enabled
+    const allowBootstrap = env.ALLOW_BOOTSTRAP_ADMIN === 'true';
+
+    if (allowBootstrap) {
+      const existingAdmins = await this.sql
+        .prepare('SELECT COUNT(*) as count FROM users WHERE roles LIKE ?')
+        .bind('%admin%')
+        .first();
+
+      if (existingAdmins.count === 0) {
+        await this.updateUserRole(email, roles);
+        return new Response(JSON.stringify({ success: true, bootstrapped: true }));
+      }
+    }
+
+    // Normal mode: Require admin authentication
+    const authUser = await this.authenticateRequest(request);
+    if (!authUser?.roles?.includes('admin')) {
+      return new Response('Forbidden', { status: 403 });
+    }
+
+    await this.updateUserRole(email, roles);
+    return new Response(JSON.stringify({ success: true }));
+  }
+
+  My Recommendation
+
+  Option 1 (Open for First User) is best for this project because:
+
+  1. Multi-tenant architecture - Each tenant:registry combination gets its own database, so the blast radius is limited
+  2. Development-focused - This is primarily a development/internal tool, not public-facing
+  3. Cloudflare deployment - Direct database access is difficult with Durable Objects
+  4. Better UX - npm run create:admin just works without manual steps
+
+  Security mitigations:
+  - Add clear documentation that first deployment should immediately create admin
+  - Log a warning when bootstrap mode is used
+  - Add monitoring/alerts if no admin exists after X minutes
+  - Consider adding a BOOTSTRAP_COMPLETE flag in the database after first admin
+
+  Implementation Priority
+
+  This is part of Phase 8 in the original plan, so it's not blocking current Phase 1 work. When you're ready to implement it,
+  I'd recommend:
+
+  1. Start with Option 1 (Open for First User)
+  2. Add logging when bootstrap mode is triggered
+  3. Document the security considerations
+  4. Consider upgrading to Option 3 (Environment-Based) later if needed
+
+  Does this clarification help? Would you like me to implement Option 1 now, or should we continue with other phases first?
+
+**Results**
+
+- Implemented the `/api/admin/update-role` endpoint with "Option 1: Open for First User" security model (see above)
+- Added 'auth' and 'admin' to the `_worker.ts` list of allowed single-tenant resource paths
+
+Verified the endpoint works correctly:
+  1. First admin promotion ✅
+    - Successfully promoted test@example.com to admin without authentication when no admins existed
+  2. Subsequent promotions require auth role ✅
+    - Rejected unauthenticated request to promote `test2@example.com` after first admin
+  existed
+  3. Database updates correctly ✅
+    - Verified roles were updated in SQLite database
+
+---
+

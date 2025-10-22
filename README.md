@@ -2,7 +2,9 @@
 
 This product is for experimental purposes. I used Claude Code to design and implement all of the source code and much of the documentation. Minimal code was written manually. I did write, rearrange, and format a significant amount of the user documentation. Yet, it is incomplete given the most recent features and functionality.
 
-I think that the schema registry product is useful, but its main purpose is for exploration. I have purposely limited some of the features and lacks extensibility.
+![Domo Schema Minder](docs/user/images/KaleleDomoSchemaMinder-Overview-01.png  "Domo Schema Minder")
+
+I think that the schema registry product is useful, but its main purpose is for exploration. I have purposely limited some of the features and the registry lacks plugin extensibility.
 
 Much of the tool's functionality resides in the browser client. There is no explicit domain model and the serverless functions primarily support CRUD persistence and support data updates via broadcasting through WebSockets.
 
@@ -12,9 +14,12 @@ All benefits of serverless apply as well as platform limitations, such as maximu
 
 ## Guide
 
-- **Claude Code Guidance:** `./CLAUDE.md`
-- **Developer Documentation:** `./docs`
-- **Source Code:** `./src`
-- **User Documentation:** `./docs/user/KaleleDomoSchemaMinder.md`
-- **License:** `./LICENSE`
-  - Mozilla Public License Version 2.0
+| What                    | Where                                    |
+--------------------------|------------------------------------------|
+| Getting Started         | `docs/GETTING_STARTED.md`                |
+| Claude Code Guidance    | `./CLAUDE.md`                            |
+| Developer Documentation | `./docs`                                 |
+| Source Code             | `./src`                                  |
+| Tests                   | `./tests`                                |
+| User Documentation      | `./docs/user/KaleleDomoSchemaMinder.md`  |
+| License (MPL 2)         | `./LICENSE`                              |

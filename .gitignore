@@ -17,8 +17,14 @@ build/
 worker.js
 
 # Environment variables and secrets
-.env
+# Base config files are committed for team defaults
+# .env                        ← Committed (base defaults)
+# .env.development            ← Committed (dev team defaults)
+# .env.production             ← Committed (prod template/docs)
+
+# Local overrides are git-ignored (personal settings & secrets)
 .env.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local

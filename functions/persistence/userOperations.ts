@@ -226,6 +226,66 @@ export class UserDatabaseOperations {
     }
   }
 
+  /**
+   * Update user roles
+   */
+  async updateUserRoles(emailAddress: string, roles: string[]): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Validate roles
+      const validRoles = ['guest', 'viewer', 'editor', 'admin'];
+      const invalidRoles = roles.filter(role => !validRoles.includes(role));
+      if (invalidRoles.length > 0) {
+        return {
+          success: false,
+          error: `Invalid roles: ${invalidRoles.join(', ')}. Valid roles are: ${validRoles.join(', ')}`
+        };
+      }
+
+      // Check if user exists
+      const user = await this.getUserByEmail(emailAddress);
+      if (!user) {
+        return {
+          success: false,
+          error: 'User not found'
+        };
+      }
+
+      // Update roles
+      const timestamp = this.getTimestamp();
+      const rolesJson = JSON.stringify(roles);
+
+      await this.sql.exec(
+        `UPDATE users SET roles = ?, updated_at = ? WHERE email_address = ?`,
+        rolesJson, timestamp, emailAddress
+      );
+
+      return { success: true };
+    } catch (error) {
+      console.error('Update user roles error:', error);
+      return {
+        success: false,
+        error: AuthError.INTERNAL_ERROR
+      };
+    }
+  }
+
+  /**
+   * Check if this is the first user in the system
+   */
+  async isFirstUser(): Promise<boolean> {
+    try {
+      const results = await this.sql.exec(
+        `SELECT COUNT(*) as count FROM users`
+      ).toArray();
+
+      const count = (results[0] as any).count;
+      return count === 0;
+    } catch (error) {
+      console.error('Check first user error:', error);
+      return false;
+    }
+  }
+
   // ================== SESSION OPERATIONS ==================
 
   /**

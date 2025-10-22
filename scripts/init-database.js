@@ -39,7 +39,7 @@ async function initializeDatabase() {
     // Make a request to the API info endpoint
     // This will create the Durable Object if it doesn't exist
     // and initialize the schema
-    const response = await fetch(`${apiUrl}/api/registry`, {
+    const response = await fetch(`${apiUrl}/schema-registry/api/registry`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ async function verifyDatabase() {
     console.log('');
     console.log('Verifying database...');
 
-    const response = await fetch(`${apiUrl}/api/products`, {
+    const response = await fetch(`${apiUrl}/schema-registry/api/products`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
