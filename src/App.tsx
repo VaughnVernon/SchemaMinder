@@ -55,7 +55,7 @@ const App: React.FC = () => {
   const subscriptionState = useSubscriptionState(authState.isAuthenticated);
 
   // Initialize change notifications hook
-  const { refresh: refreshChangeNotifications } = useChangeNotifications();
+  useChangeNotifications();
 
   // Create a sorted version of the registry data for tree display
   const sortedRegistry = useMemo(() => ({
