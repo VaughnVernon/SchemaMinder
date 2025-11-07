@@ -22,4 +22,4 @@ All benefits of serverless apply as well as platform limitations, such as maximu
 | Source Code             | `./src`                                  |
 | Tests                   | `./tests`                                |
 | User Documentation      | `./docs/user/KaleleDomoSchemaMinder.md`  |
-| License (MPL 2)         | `./LICENSE`                              |
+| License (RPL 1.5)       | `./LICENSE` see also https://opensource.org/license/rpl-1-5 |
