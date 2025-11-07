@@ -22,13 +22,13 @@ All benefits of serverless apply as well as platform limitations, such as maximu
 | Source Code             | `./src`                                  |
 | Tests                   | `./tests`                                |
 | User Documentation      | `./docs/user/KaleleDomoSchemaMinder.md`  |
-| License (RPL 1.5)       | `./LICENSE` see also https://opensource.org/license/rpl-1-5 |
+| License (RPL 1.5)       | `./LICENSE.md` see also https://opensource.org/license/rpl-1-5 |
 
 ## License
 
 Reciprocal Public License 1.5
 
-See: [LICENSE](./LICENSE)
+See: [LICENSE](./LICENSE.md)
 
 Copyright © 2012-2025 Vaughn Vernon. All rights reserved.
 Copyright © 2012-2025 Kalele, Inc. All rights reserved.
